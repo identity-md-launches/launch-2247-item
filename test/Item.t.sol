@@ -354,8 +354,26 @@ contract ItemTest is Test {
             "upgradeTo(address)",
             "setTransfersEnabled(bool)"
         ];
+        // Use valid arguments for each ABI: a malformed bool or oversized mint amount can
+        // otherwise revert before testing whether a privileged entry point is available.
+        bytes[14] memory calls = [
+            abi.encodeWithSignature(signatures[0], alice, 100),
+            abi.encodeWithSignature(signatures[1], 100),
+            abi.encodeWithSignature(signatures[2]),
+            abi.encodeWithSignature(signatures[3], 100),
+            abi.encodeWithSignature(signatures[4], alice, 100),
+            abi.encodeWithSignature(signatures[5]),
+            abi.encodeWithSignature(signatures[6], alice),
+            abi.encodeWithSignature(signatures[7], alice),
+            abi.encodeWithSignature(signatures[8], alice),
+            abi.encodeWithSignature(signatures[9], alice),
+            abi.encodeWithSignature(signatures[10], alice),
+            abi.encodeWithSignature(signatures[11], alice),
+            abi.encodeWithSignature(signatures[12], address(token)),
+            abi.encodeWithSignature(signatures[13], false)
+        ];
         for (uint256 i; i < signatures.length; ++i) {
-            bytes memory data = abi.encodeWithSignature(signatures[i], alice, 100);
+            bytes memory data = calls[i];
             (bool ok,) = address(token).call(data);
             assertFalse(ok, signatures[i]);
             vm.prank(bob);
